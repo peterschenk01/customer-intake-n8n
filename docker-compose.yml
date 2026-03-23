@@ -63,3 +63,11 @@ services:
     volumes:
       - ollama_storage:/root/.ollama
     restart: always
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: frontend
+    ports:
+      - "8000:8000"
+    restart: always
