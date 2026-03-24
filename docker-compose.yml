@@ -71,11 +71,3 @@ services:
     ports:
       - "8000:8000"
     restart: always
-
-  whisperx-api:
-    build:
-      context: ./whisperx-api
-    container_name: whisperx-api
-    ports:
-      - "8001:8000"
-    restart: always
