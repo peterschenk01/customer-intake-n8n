@@ -2,6 +2,8 @@
 
 A centralized `n8n` workflow for processing customer interactions from multiple channels, including webhooks, audio uploads, and inbound email. The system uses `n8n` to turn raw customer communication into structured, reviewable records. It supports transcription, speaker diarization, summarization, sentiment analysis, and follow-up classification.
 
+> The assignment and explanation (in German) can be found in the [assignment](./assignment/) folder.
+
 ## Features
 
 - Accepts customer input from:
