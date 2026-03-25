@@ -12,7 +12,7 @@ The system uses `n8n` to turn raw customer communication into structured, review
   - inbound email via IMAP
 - Transcribes and diarizes audio input
 - Normalizes incoming data into a consistent schema
-- Generates German-language summaries using an LLM
+- Generates German summaries using an LLM
 - Classifies sentiment as `good`, `neutral`, or `bad`
 - Flags follow-up items with `open_todo=true`
 - Flags critical cases with `is_critical=true`
@@ -150,7 +150,7 @@ It includes:
 ## Known Limitations
 
 * The demo setup does not include authentication for the UI, webhooks, or `n8n`.
-* The workflow is currently optimized for German-language contacts.
+* The workflow is currently built for German contacts and summaries.
 * The bundled `llama3.2:3b` model may be too weak for reliable structured output.
 * Diarization depends on AssemblyAI and requires outbound network access.
 * Critical-case detection currently relies on simple rules rather than a more robust decision model.
