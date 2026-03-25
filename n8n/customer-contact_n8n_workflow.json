@@ -10,8 +10,8 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        0,
-        176
+        304,
+        224
       ],
       "id": "41542923-a6e8-4fff-8ea1-9552799d43b0",
       "name": "Webhook",
@@ -29,8 +29,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        0,
-        352
+        304,
+        48
       ],
       "id": "28ef181b-f8ee-4120-a70c-639884b3bdd5",
       "name": "Test Webhook"
@@ -38,13 +38,13 @@
     {
       "parameters": {
         "mode": "runOnceForEachItem",
-        "jsCode": "const body = $json.body;\n\nconst normalized = {\n  source_channel: 'webhook',\n  customer_name: body.customer?.name ?? '',\n  customer_email: body.customer?.email ?? '',\n  customer_phone: body.customer?.phone ?? '',\n  subject: body.subject ?? '',\n  raw_text: body.message ?? '',\n};\n\nreturn {\n  json: normalized\n};"
+        "jsCode": "const body = $json.body;\n\nconst normalized = {\n  source_channel: 'webhook',\n  customer_name: body.customer?.name ?? '',\n  customer_email: body.customer?.email ?? '',\n  customer_phone: body.customer?.phone ?? '',\n  subject: body.subject ?? '',\n  text: body.message ?? '',\n  segments: ''\n};\n\nreturn {\n  json: normalized\n};"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        208,
-        176
+        512,
+        224
       ],
       "id": "c6e5385a-3f9f-43a6-a1bd-fcc5120a99e7",
       "name": "Normalize"
@@ -52,38 +52,18 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "=Du analysierst eingehende Nachrichten von Kunden.\n\nEingabe:\nBetreff: {{$json.subject}}\nText: {{$json.raw_text}}\n\nGib NUR gültiges JSON zurück. Kein Markdown, keine Erklärung.\n\nJSON-Schema:\n{\n\"summary\": \"2 bis 3 Sätze detaillierte, inhaltlich vollständige Zusammenfassung\",\n\"sentiment\": \"good|neutral|bad\",\n\"open_todo\": \"boolean, ob es ein offenes To-do gibt\"\n}\n\nRegeln:\n\n- Die Zusammenfassung muss alle wichtigen Informationen, Kontexte und ggf. Handlungsaufforderungen enthalten.\n- Nenne relevante Details (z. B. Termine, Probleme, Entscheidungen), ohne auszuschweifen.\n- Sei präzise und sachlich.\n- Erfinde keine Details.\n- sentiment muss genau eines sein: good, neutral, bad.\n- open_todo muss ein Boolean sein.\n",
+        "text": "=Du analysierst eingehende Nachrichten von Kunden.\n\nEingabe:\nBetreff: {{$json.subject}}\nText: {{$json.text}}\n\nGib NUR gültiges JSON zurück. Kein Markdown, keine Erklärung.\n\nJSON-Schema:\n{\n\"summary\": \"2 bis 3 Sätze detaillierte, inhaltlich vollständige Zusammenfassung\",\n\"sentiment\": \"good|neutral|bad\",\n\"open_todo\": \"boolean, ob es ein offenes To-do gibt\"\n}\n\nRegeln:\n\n- Die Zusammenfassung muss alle wichtigen Informationen, Kontexte und ggf. Handlungsaufforderungen enthalten.\n- Nenne relevante Details (z. B. Termine, Probleme, Entscheidungen), ohne auszuschweifen.\n- Sei präzise und sachlich.\n- Erfinde keine Details.\n- sentiment muss genau eines sein: good, neutral, bad.\n- open_todo muss ein Boolean sein.\n",
         "batching": {}
       },
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
       "typeVersion": 1.9,
       "position": [
-        416,
-        256
+        880,
+        368
       ],
       "id": "e80a1f6a-02c1-49c3-ab0e-6e2243a4f3f4",
       "name": "Basic LLM Chain",
       "alwaysOutputData": false
-    },
-    {
-      "parameters": {
-        "model": "llama3.2:3b",
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
-      "typeVersion": 1,
-      "position": [
-        416,
-        432
-      ],
-      "id": "d3f4091a-ca4d-42c6-9a8f-a01bae7b7704",
-      "name": "Ollama Chat Model",
-      "credentials": {
-        "ollamaApi": {
-          "id": "RDx31laOmPgXX8Lj",
-          "name": "Ollama account"
-        }
-      }
     },
     {
       "parameters": {
@@ -93,8 +73,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        720,
-        256
+        1184,
+        368
       ],
       "id": "b3bcf155-c6a3-416d-a797-b7fd464a38b2",
       "name": "Parse JSON"
@@ -122,7 +102,10 @@
               "name": "subject"
             },
             {
-              "name": "raw_text"
+              "name": "text"
+            },
+            {
+              "name": "segments"
             },
             {
               "name": "summary"
@@ -147,8 +130,8 @@
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1.1,
       "position": [
-        160,
-        -80
+        1008,
+        -96
       ],
       "id": "403109a1-5244-4204-a369-94a324a8fc82",
       "name": "Create a data table"
@@ -158,8 +141,8 @@
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        0,
-        -80
+        848,
+        -96
       ],
       "id": "202ddc52-ac23-4871-9a94-e24485774671",
       "name": "Manual Trigger"
@@ -173,8 +156,8 @@
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
       "position": [
-        1136,
-        192
+        1776,
+        368
       ],
       "id": "de7db4d4-117a-4084-8e78-c5390f0a2677",
       "name": "Merge"
@@ -183,15 +166,16 @@
       "parameters": {
         "dataTableId": {
           "__rl": true,
-          "value": "UwCMBQCJ7ITsq1lU",
+          "value": "O9vX30QsYwJGWurZ",
           "mode": "list",
           "cachedResultName": "customer_contacts",
-          "cachedResultUrl": "/projects/0vRqFIjdxBUoXSgT/datatables/UwCMBQCJ7ITsq1lU"
+          "cachedResultUrl": "/projects/0vRqFIjdxBUoXSgT/datatables/O9vX30QsYwJGWurZ"
         },
         "columns": {
           "mappingMode": "autoMapInputData",
           "value": {
-            "open_todo": false
+            "open_todo": false,
+            "is_critical": false
           },
           "matchingColumns": [],
           "schema": [
@@ -246,8 +230,18 @@
               "removed": false
             },
             {
-              "id": "raw_text",
-              "displayName": "raw_text",
+              "id": "text",
+              "displayName": "text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "segments",
+              "displayName": "segments",
               "required": false,
               "defaultMatch": false,
               "display": true,
@@ -284,6 +278,16 @@
               "type": "boolean",
               "readOnly": false,
               "removed": false
+            },
+            {
+              "id": "is_critical",
+              "displayName": "is_critical",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": false
             }
           ],
           "attemptToConvertTypes": false,
@@ -294,8 +298,8 @@
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1.1,
       "position": [
-        1344,
-        192
+        1984,
+        368
       ],
       "id": "8febf88f-85a0-466e-9bc1-8d998665ae44",
       "name": "Insert row"
@@ -308,8 +312,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        896,
-        256
+        1360,
+        368
       ],
       "id": "ebac3e00-b2e0-45d3-b1d9-60de4edc5fcb",
       "name": "Check if critical"
@@ -342,8 +346,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        1552,
-        192
+        2192,
+        368
       ],
       "id": "c4e7e7b8-43b9-416e-a4c8-5c4edf8432c4",
       "name": "If critical"
@@ -356,8 +360,8 @@
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
       "position": [
-        1808,
-        176
+        2448,
+        368
       ],
       "id": "0f205228-8d1a-435e-8d71-0c7537165abc",
       "name": "Emergency Notification",
@@ -372,15 +376,407 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -16,
-        640
+        0,
+        608
       ],
       "id": "3d3d3de3-6075-44ca-8bf9-9fa1a8c35654",
       "name": "Webhook Audio Upload",
       "webhookId": "d3680ff1-15c7-417b-b379-33ac90b1bdbb"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://audio-processing-api:8000/api/transcribe",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "audio"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        208,
+        912
+      ],
+      "id": "8ca04f10-4c12-4358-9998-99cc461a8457",
+      "name": "Transcribe Local"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://audio-processing-api:8000/api/diarize",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "audio"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        208,
+        720
+      ],
+      "id": "4707c5db-be23-4f43-b69a-2da402e7d0ec",
+      "name": "Transcribe and Diarize API"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const body = $json.body;\n\nconst combinedSegments = $json.segments\n  .map(segment => `Sprecher ${segment.speaker}: ${segment.text}`)\n  .join(\" \");\n\nconst normalized = {\n  source_channel: 'audio',\n  customer_name:  '',\n  customer_email: '',\n  customer_phone: body.phone ?? '',\n  subject: '',\n  text: combinedSegments ?? '',\n  segments: JSON.stringify($json.segments, null, 2)\n};\n\nreturn {\n  json: normalized\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        624,
+        624
+      ],
+      "id": "d8396c54-9ea2-4b7c-aa63-f4403fd19e00",
+      "name": "Normalize1"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        416,
+        624
+      ],
+      "id": "2505bfab-e699-41a8-95ec-8de08e8302c9",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "model": "llama3.2:3b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmOllama",
+      "typeVersion": 1,
+      "position": [
+        880,
+        512
+      ],
+      "id": "0e029fed-8b7c-4470-8ee1-2483f6578e5b",
+      "name": "Ollama Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "RDx31laOmPgXX8Lj",
+          "name": "Ollama account"
+        }
+      }
     }
   ],
-  "pinData": {},
+  "pinData": {
+    "Transcribe and Diarize API": [
+      {
+        "json": {
+          "transcript_text": "Hallo, guten Tag, Wilhelm ist mein Name, ich bin Kundenberater der Firma Nutriopharm. Sie haben sich bei uns eingetragen für das Produkt Erosen, Herr Schnicke. Ja, da habe ich gerade mit einem Kollegen gesprochen von Ihnen. Ach so, gerade vor kurzem? Ja, vor kurzem, ja. Ja, also Sie haben das Angebot abgelehnt, wahrscheinlich wegen dem hohen Preis, ne? Genau, also der Grund unseres Telefonates jetzt, ich denke, wir haben ein neues Angebot für Sie, ein tolles Angebot. Also wir können Ihnen die 40 Kapseln Erosin für eine vollständige Genesungskur anstatt 234 für 165 anbieten, und da bezahlen Sie nur 41 Euro für jede Packung. Diese 40 Kapseln würden ausreichen, ihre Männergesundheit wiederherzustellen, also das gesamte urogenitale System des Mannes wird ins Gleichgewicht gebracht mit den notwendigen Vitaminen, Hormonen, Mineralien, Antioxidantien und alles, was der Körper braucht, was eine gute Erektion und eine hohe Dauer des Geschlechtsverkehrs gewährleistet, Herr Schnitte. Also es wäre eine tolle Angelegenheit für Sie. Ja, ich habe ja schon Präparate, habe ja schon jetzt hier. Ja, also unser Präparat Erosin unterscheidet sich sehr von den herkömmlichen Mitteln, die Sie zuvor bestellt haben oder gekauft haben, sowohl in der Zusammensetzung als auch in der Wirkung. Es ist völlig natürlich, hat keine Kontraindikationen und Nebenwirkungen und wurde speziell entwickelt, um die Produktion Ihres eigenen Testosterons wiederherzustellen. Es normalisiert auch die Arbeit des Urogenitalsystems im Allgemeinen und stimuliert die Blutzirkulation für eine dauerhafte Erektion. Funktioniert unabhängig vom Alter, belastet nicht das Herz, so wie Viagra oder Cialis zum Beispiel, verursacht auch keine Allergie, Übelkeit, Schwindel, ne. Also das Produkt ist sehr effektiv. Hat ein garantiertes und schnelles Ergebnis, und außerdem verfügt das Produkt über Qualitätszertifikate und klinische Studien, die seine Sicherheit und Wirksamkeit bestätigen, Herr Schnieke. Ja, ich hab das gelesen, habe ich das. Ja, ich bin gerade auf Ihrer Seite, Kreuter. Genau, also Erosene ist wirklich das Beste, was Sie für Ihren Urogenitaltrakt machen können, und es wurde nicht nur für den Geschlechtsverkehr gedacht, sondern um eine therapeutische Wirkung für mindestens 3 Jahre zu erreichen. Also es ist auch gut, falls Sie Probleme beim Wasserlassen haben, hormonelle Störungen, Schmerzen, Unbehagen, Prostatitis. Ja, wurden Sie schon in der Prostata operiert, Herr Schnicke? Nein, wurde ich noch nie. Ich habe jetzt einen Termin gekriegt, jetzt nächsten Monat, also nächste Woche. Muss ich zum Urologen. Ja. So, weil, wenn ich denn also jetzt höre, da ist die Prostata vergrößert, ne, ist da— Ah, die Prostata ist vergrößert. Also es wurde schon festgestellt. Ja. Wo ich vor 3 Jahren schon da war, beim Urologen, da wurde das schon festgestellt. Ja, also Erosin wird Ihnen bestimmt sehr gut tun. Na, also ich habe jetzt ein anderes Präparat, das geht praktisch die Bröcke da verkleinern und mit Erfolg jetzt. Also ich habe kein Brennen beim Auto laufen gehen, nichts hier, also es tut nichts weh. Ja, also Erosin hat eine komplexe Wirkung auf das gesamte Urinkalensystem, schizomanisch. Es fördert die Produktion von Testosteron, das normale Funktionieren des Kreislaufs. Sowie das richtige Gleichgewicht von Hormonen und Vitaminen im Organismus. Und es hat auch eine kumulative Wirkung, deswegen empfehlen wir oder bieten wir mindestens 40 Kapseln an. Also die ersten 2 Packungen geben einen ersten Effekt, aber die vollständige Lösung des Problems braucht natürlich etwas Zeit. Und es ist auch wichtig, täglich einzunehmen, also eine Kapsel pro Tag, am besten zur gleichen Uhrzeit. Immer, und falls Sie Geschlechtsverkehr haben wollen, empfehlen wir mindestens 15 Minuten vorher einzunehmen, aber nicht mehr als eine Kapsel pro Tag. Ja, 95% unserer Kunden sind mit den Ergebnissen zufrieden in ganz Deutschland, und dies wird durch Umfragen von Menschen bestätigt, die den Kurs schon abgeschlossen haben, Herr Schnicke. Also eine Packung kostet normalerweise 79 und noch heute haben Sie die Chance, die 4 Packungen für 165 zu bekommen. Also es wäre ein tolles Angebot für Sie, ne? Ja, es ist Angebot. Hier steht 39 die Packung. Genau, ja, also 39 ist der Aktionspreis mit Ermäßigung für eine Packung. Und wir können, wie gesagt, für 41 Euro jede Packung machen, einschließlich Versandkosten. Alles schon mittendrin. Sie erhalten 40 Kapseln. Haben Sie welche Bedenken, Herr Schnieke? Ja, ja, ich bedenke schon, warum das so gemacht wird. Weil Zähne drin sind, ne? Ja, also Erosin ist auch gut mit anderen Medikamenten kombinierbar, falls Sie welche einnehmen, von Arzt verschrieben, und ist sogar mit Alkohol kombinierbar. Also Sie können ruhig dann Ihr Bier trinken und so weiter. Ne, also, passen Sie mal an, ich brauche mal Bedenkzeit. Ich melde mich mal später nochmal. Ja, also es wäre natürlich super, wenn Sie heute noch bei uns melden, damit Sie das Angebot nicht verlieren, ne? Weil im Gegensatz zu den Mitteln, die Sie, von denen Sie sagen, dass Sie schon ausprobiert haben und die Ihnen kein Ergebnis gebracht haben, ne? Unser Produkt wirkt schon. Das ist genauso ein Mittel wie bei Ihnen. Das hilft nicht gleich von heute auf morgen. Nein, also tatsächlich, ne? Also die Wirkung tritt beim schon nach den ersten Tagen die Anwendung, so ungefähr nach dem 7. oder 10. Tag. Sie sollten jedoch weiter einnehmen, bis alle 40 Kapseln fertig sind, damit garantiert, dass der Körper genug Inhaltsstoffe absorbiert. Ja, Sie werden erstens die Kur in 2 oder 3 Jahren wiederholen müssen, wenn Sie wollen. Also Sie sind dazu nicht verpflichtet, aber zumindest so wird es empfohlen, weil mit dem Alter können solche Probleme mit Erektion auftreten bei uns Männer. Deswegen ist es auch empfehlenswert, zeitweise nachzuholen. Ja, deswegen habe ich jetzt hier Termin nächsten Monat, also Anfang nächsten Monats beim Urologen. Deswegen lasse mich da mal beraten. Ja, aber Sie haben gesagt, Sie haben schon einen Verdächtigen, Prostata, ne? Ja, ich habe, habe hier auch schon Medikamente, habe ich schon hier und habe ich mir schon gekauft, alles schön. So, und das hilft auch jetzt hier. Also ich habe ja nur beim Wasserlaufen jetzt durch die Creme und ganz durchschlafen, genau, das ist doch schon Erfolg. Ja, also Sie können dadurch den Testosteronspiegel aufrechthalten, was ja auch hilft. Das habe ich extra, Testosteron habe ich extra für Sie da, und da brauche ich bloß einen Tropfen in den Mund zu nehmen hier, und das reicht von ganzem Tag. Ah, verstehe. Deswegen habe ich. Und das letzte jetzt hier, Vitamin D2, die habe ich jetzt bestellt. Die nehme ich dann auch anschließend noch dazu. Ja, Isoerosin unterscheidet sich sowohl in der Zusammensetzung als auch in der Wirkung von den herkömmlichen Mitteln erheblich. Also L-Arginin zum Beispiel hat eine erweiternde Wirkung. Auf die Gefäßwände und auf die Arterien. Also ist sehr gut für die Durchblutung. Serenor-Palme-Extrakt normalisiert auch von der Prostata. Das habe ich alles mit in meinem Päckchen jetzt. Ah, okay. Da muss ich auch 2 Tabletten nehmen, früh und abends nach der Mahlzeiten. Und das mache ich jetzt schon die ganzen Monate, habe ich das jetzt schon. Und nach 3 Monaten hab ich noch dazu gekauft, nochmal vor 3 Monaten. Und das hilft auch. Ja, und haben Sie da Erfolg damit? Ja, jetzt mit dem Wellengebrochenen da, hab ich Erfolg. Das hat er beim Ping-Pong mir gesagt, hat es da wehgetan am Anfang. Jetzt ist es weg jetzt. Und musste in der Nacht hier 3, 4 Mal raus. Und das ist auch weg jetzt. Jetzt kann ich durchschlafen bis früh. Ah, sehr gut. Ja. Also wollen Sie das Angebot nicht nutzen, Herr Schnicke? Nein, wir lassen das. Ich zeige später. Mal sehen. Okay, ja. Ja, okay, sollen wir Sie später mal anrufen oder machen Sie das? Nein, ich habe jetzt Ihre Seite hier, da kann ich sofort draufgehen. Okay, good. I wish you a nice weekend. Yeah, I wish you also a nice day.",
+          "segments": [
+            {
+              "speaker": "A",
+              "start": 3060,
+              "end": 14804,
+              "text": "Hallo, guten Tag, Wilhelm ist mein Name, ich bin Kundenberater der Firma Nutriopharm. Sie haben sich bei uns eingetragen für das Produkt Erosen, Herr Schnicke."
+            },
+            {
+              "speaker": "B",
+              "start": 16759,
+              "end": 20572,
+              "text": "Ja, da habe ich gerade mit einem Kollegen gesprochen von Ihnen."
+            },
+            {
+              "speaker": "A",
+              "start": 20780,
+              "end": 21854,
+              "text": "Ach so, gerade vor kurzem?"
+            },
+            {
+              "speaker": "B",
+              "start": 23248,
+              "end": 24097,
+              "text": "Ja, vor kurzem, ja."
+            },
+            {
+              "speaker": "A",
+              "start": 25026,
+              "end": 79086,
+              "text": "Ja, also Sie haben das Angebot abgelehnt, wahrscheinlich wegen dem hohen Preis, ne? Genau, also der Grund unseres Telefonates jetzt, ich denke, wir haben ein neues Angebot für Sie, ein tolles Angebot. Also wir können Ihnen die 40 Kapseln Erosin für eine vollständige Genesungskur anstatt 234 für 165 anbieten, und da bezahlen Sie nur 41 Euro für jede Packung. Diese 40 Kapseln würden ausreichen, ihre Männergesundheit wiederherzustellen, also das gesamte urogenitale System des Mannes wird ins Gleichgewicht gebracht mit den notwendigen Vitaminen, Hormonen, Mineralien, Antioxidantien und alles, was der Körper braucht, was eine gute Erektion und eine hohe Dauer des Geschlechtsverkehrs gewährleistet, Herr Schnitte. Also es wäre eine tolle Angelegenheit für Sie."
+            },
+            {
+              "speaker": "B",
+              "start": 81386,
+              "end": 86255,
+              "text": "Ja, ich habe ja schon Präparate, habe ja schon jetzt hier."
+            },
+            {
+              "speaker": "A",
+              "start": 86367,
+              "end": 147295,
+              "text": "Ja, also unser Präparat Erosin unterscheidet sich sehr von den herkömmlichen Mitteln, die Sie zuvor bestellt haben oder gekauft haben, sowohl in der Zusammensetzung als auch in der Wirkung. Es ist völlig natürlich, hat keine Kontraindikationen und Nebenwirkungen und wurde speziell entwickelt, um die Produktion Ihres eigenen Testosterons wiederherzustellen. Es normalisiert auch die Arbeit des Urogenitalsystems im Allgemeinen und stimuliert die Blutzirkulation für eine dauerhafte Erektion. Funktioniert unabhängig vom Alter, belastet nicht das Herz, so wie Viagra oder Cialis zum Beispiel, verursacht auch keine Allergie, Übelkeit, Schwindel, ne. Also das Produkt ist sehr effektiv. Hat ein garantiertes und schnelles Ergebnis, und außerdem verfügt das Produkt über Qualitätszertifikate und klinische Studien, die seine Sicherheit und Wirksamkeit bestätigen, Herr Schnieke."
+            },
+            {
+              "speaker": "B",
+              "start": 148230,
+              "end": 153982,
+              "text": "Ja, ich hab das gelesen, habe ich das. Ja, ich bin gerade auf Ihrer Seite, Kreuter."
+            },
+            {
+              "speaker": "A",
+              "start": 155383,
+              "end": 188166,
+              "text": "Genau, also Erosene ist wirklich das Beste, was Sie für Ihren Urogenitaltrakt machen können, und es wurde nicht nur für den Geschlechtsverkehr gedacht, sondern um eine therapeutische Wirkung für mindestens 3 Jahre zu erreichen. Also es ist auch gut, falls Sie Probleme beim Wasserlassen haben, hormonelle Störungen, Schmerzen, Unbehagen, Prostatitis. Ja, wurden Sie schon in der Prostata operiert, Herr Schnicke?"
+            },
+            {
+              "speaker": "B",
+              "start": 189322,
+              "end": 197560,
+              "text": "Nein, wurde ich noch nie. Ich habe jetzt einen Termin gekriegt, jetzt nächsten Monat, also nächste Woche. Muss ich zum Urologen."
+            },
+            {
+              "speaker": "A",
+              "start": 198717,
+              "end": 198877,
+              "text": "Ja."
+            },
+            {
+              "speaker": "B",
+              "start": 201286,
+              "end": 207406,
+              "text": "So, weil, wenn ich denn also jetzt höre, da ist die Prostata vergrößert, ne, ist da—"
+            },
+            {
+              "speaker": "A",
+              "start": 207406,
+              "end": 212096,
+              "text": "Ah, die Prostata ist vergrößert. Also es wurde schon festgestellt."
+            },
+            {
+              "speaker": "B",
+              "start": 212449,
+              "end": 218521,
+              "text": "Ja. Wo ich vor 3 Jahren schon da war, beim Urologen, da wurde das schon festgestellt."
+            },
+            {
+              "speaker": "A",
+              "start": 219372,
+              "end": 221653,
+              "text": "Ja, also Erosin wird Ihnen bestimmt sehr gut tun."
+            },
+            {
+              "speaker": "B",
+              "start": 222487,
+              "end": 237946,
+              "text": "Na, also ich habe jetzt ein anderes Präparat, das geht praktisch die Bröcke da verkleinern und mit Erfolg jetzt. Also ich habe kein Brennen beim Auto laufen gehen, nichts hier, also es tut nichts weh."
+            },
+            {
+              "speaker": "A",
+              "start": 238476,
+              "end": 322603,
+              "text": "Ja, also Erosin hat eine komplexe Wirkung auf das gesamte Urinkalensystem, schizomanisch. Es fördert die Produktion von Testosteron, das normale Funktionieren des Kreislaufs. Sowie das richtige Gleichgewicht von Hormonen und Vitaminen im Organismus. Und es hat auch eine kumulative Wirkung, deswegen empfehlen wir oder bieten wir mindestens 40 Kapseln an. Also die ersten 2 Packungen geben einen ersten Effekt, aber die vollständige Lösung des Problems braucht natürlich etwas Zeit. Und es ist auch wichtig, täglich einzunehmen, also eine Kapsel pro Tag, am besten zur gleichen Uhrzeit. Immer, und falls Sie Geschlechtsverkehr haben wollen, empfehlen wir mindestens 15 Minuten vorher einzunehmen, aber nicht mehr als eine Kapsel pro Tag. Ja, 95% unserer Kunden sind mit den Ergebnissen zufrieden in ganz Deutschland, und dies wird durch Umfragen von Menschen bestätigt, die den Kurs schon abgeschlossen haben, Herr Schnicke. Also eine Packung kostet normalerweise 79 und noch heute haben Sie die Chance, die 4 Packungen für 165 zu bekommen. Also es wäre ein tolles Angebot für Sie, ne?"
+            },
+            {
+              "speaker": "B",
+              "start": 325205,
+              "end": 330392,
+              "text": "Ja, es ist Angebot. Hier steht 39 die Packung."
+            },
+            {
+              "speaker": "A",
+              "start": 330505,
+              "end": 353997,
+              "text": "Genau, ja, also 39 ist der Aktionspreis mit Ermäßigung für eine Packung. Und wir können, wie gesagt, für 41 Euro jede Packung machen, einschließlich Versandkosten. Alles schon mittendrin. Sie erhalten 40 Kapseln. Haben Sie welche Bedenken, Herr Schnieke?"
+            },
+            {
+              "speaker": "B",
+              "start": 355554,
+              "end": 361142,
+              "text": "Ja, ja, ich bedenke schon, warum das so gemacht wird. Weil Zähne drin sind, ne?"
+            },
+            {
+              "speaker": "A",
+              "start": 362313,
+              "end": 375069,
+              "text": "Ja, also Erosin ist auch gut mit anderen Medikamenten kombinierbar, falls Sie welche einnehmen, von Arzt verschrieben, und ist sogar mit Alkohol kombinierbar. Also Sie können ruhig dann Ihr Bier trinken und so weiter."
+            },
+            {
+              "speaker": "B",
+              "start": 375437,
+              "end": 386430,
+              "text": "Ne, also, passen Sie mal an, ich brauche mal Bedenkzeit. Ich melde mich mal später nochmal."
+            },
+            {
+              "speaker": "A",
+              "start": 387699,
+              "end": 402192,
+              "text": "Ja, also es wäre natürlich super, wenn Sie heute noch bei uns melden, damit Sie das Angebot nicht verlieren, ne? Weil im Gegensatz zu den Mitteln, die Sie, von denen Sie sagen, dass Sie schon ausprobiert haben und die Ihnen kein Ergebnis gebracht haben, ne?"
+            },
+            {
+              "speaker": "B",
+              "start": 402644,
+              "end": 409338,
+              "text": "Unser Produkt wirkt schon. Das ist genauso ein Mittel wie bei Ihnen. Das hilft nicht gleich von heute auf morgen."
+            },
+            {
+              "speaker": "A",
+              "start": 410352,
+              "end": 452837,
+              "text": "Nein, also tatsächlich, ne? Also die Wirkung tritt beim schon nach den ersten Tagen die Anwendung, so ungefähr nach dem 7. oder 10. Tag. Sie sollten jedoch weiter einnehmen, bis alle 40 Kapseln fertig sind, damit garantiert, dass der Körper genug Inhaltsstoffe absorbiert. Ja, Sie werden erstens die Kur in 2 oder 3 Jahren wiederholen müssen, wenn Sie wollen. Also Sie sind dazu nicht verpflichtet, aber zumindest so wird es empfohlen, weil mit dem Alter können solche Probleme mit Erektion auftreten bei uns Männer. Deswegen ist es auch empfehlenswert, zeitweise nachzuholen."
+            },
+            {
+              "speaker": "B",
+              "start": 454077,
+              "end": 482744,
+              "text": "Ja, deswegen habe ich jetzt hier Termin nächsten Monat, also Anfang nächsten Monats beim Urologen. Deswegen lasse mich da mal beraten. Ja, aber Sie haben gesagt, Sie haben schon einen Verdächtigen, Prostata, ne? Ja, ich habe, habe hier auch schon Medikamente, habe ich schon hier und habe ich mir schon gekauft, alles schön. So, und das hilft auch jetzt hier. Also ich habe ja nur beim Wasserlaufen jetzt durch die Creme und ganz durchschlafen, genau, das ist doch schon Erfolg."
+            },
+            {
+              "speaker": "A",
+              "start": 483922,
+              "end": 489723,
+              "text": "Ja, also Sie können dadurch den Testosteronspiegel aufrechthalten, was ja auch hilft."
+            },
+            {
+              "speaker": "B",
+              "start": 489916,
+              "end": 500210,
+              "text": "Das habe ich extra, Testosteron habe ich extra für Sie da, und da brauche ich bloß einen Tropfen in den Mund zu nehmen hier, und das reicht von ganzem Tag."
+            },
+            {
+              "speaker": "A",
+              "start": 501543,
+              "end": 502377,
+              "text": "Ah, verstehe."
+            },
+            {
+              "speaker": "B",
+              "start": 502489,
+              "end": 515762,
+              "text": "Deswegen habe ich. Und das letzte jetzt hier, Vitamin D2, die habe ich jetzt bestellt. Die nehme ich dann auch anschließend noch dazu."
+            },
+            {
+              "speaker": "A",
+              "start": 515875,
+              "end": 536923,
+              "text": "Ja, Isoerosin unterscheidet sich sowohl in der Zusammensetzung als auch in der Wirkung von den herkömmlichen Mitteln erheblich. Also L-Arginin zum Beispiel hat eine erweiternde Wirkung. Auf die Gefäßwände und auf die Arterien. Also ist sehr gut für die Durchblutung. Serenor-Palme-Extrakt normalisiert auch von der Prostata."
+            },
+            {
+              "speaker": "B",
+              "start": 538077,
+              "end": 541812,
+              "text": "Das habe ich alles mit in meinem Päckchen jetzt."
+            },
+            {
+              "speaker": "A",
+              "start": 542021,
+              "end": 542454,
+              "text": "Ah, okay."
+            },
+            {
+              "speaker": "B",
+              "start": 542566,
+              "end": 559136,
+              "text": "Da muss ich auch 2 Tabletten nehmen, früh und abends nach der Mahlzeiten. Und das mache ich jetzt schon die ganzen Monate, habe ich das jetzt schon. Und nach 3 Monaten hab ich noch dazu gekauft, nochmal vor 3 Monaten. Und das hilft auch."
+            },
+            {
+              "speaker": "A",
+              "start": 559248,
+              "end": 562411,
+              "text": "Ja, und haben Sie da Erfolg damit?"
+            },
+            {
+              "speaker": "B",
+              "start": 563985,
+              "end": 581406,
+              "text": "Ja, jetzt mit dem Wellengebrochenen da, hab ich Erfolg. Das hat er beim Ping-Pong mir gesagt, hat es da wehgetan am Anfang. Jetzt ist es weg jetzt. Und musste in der Nacht hier 3, 4 Mal raus. Und das ist auch weg jetzt. Jetzt kann ich durchschlafen bis früh."
+            },
+            {
+              "speaker": "A",
+              "start": 582547,
+              "end": 590126,
+              "text": "Ah, sehr gut. Ja. Also wollen Sie das Angebot nicht nutzen, Herr Schnicke?"
+            },
+            {
+              "speaker": "B",
+              "start": 591844,
+              "end": 596902,
+              "text": "Nein, wir lassen das. Ich zeige später. Mal sehen. Okay, ja."
+            },
+            {
+              "speaker": "A",
+              "start": 598026,
+              "end": 601767,
+              "text": "Ja, okay, sollen wir Sie später mal anrufen oder machen Sie das?"
+            },
+            {
+              "speaker": "B",
+              "start": 602281,
+              "end": 606103,
+              "text": "Nein, ich habe jetzt Ihre Seite hier, da kann ich sofort draufgehen."
+            },
+            {
+              "speaker": "A",
+              "start": 607516,
+              "end": 607869,
+              "text": "Okay, good."
+            },
+            {
+              "speaker": "B",
+              "start": 608078,
+              "end": 619917,
+              "text": "I wish you a nice weekend. Yeah, I wish you also a nice day."
+            }
+          ]
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "Basic LLM Chain": [
+      {
+        "json": {
+          "text": "{\n  \"summary\": \"Herr Schnicke hat sich für das Produkt Erosen von Nutriopharm interessiert. Sprecher A erklärt die Vorteile des Produkts und bietet eine reduzierte Version an. Herr Schnieke ist zunächst skeptisch, aber entscheidet sich letztendlich nicht für die Anschaffung.\",\n  \"sentiment\": \"good\",\n  \"open_todo\": false\n}"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "Normalize1": [
+      {
+        "json": {
+          "source_channel": "audio",
+          "customer_name": "",
+          "customer_email": "",
+          "customer_phone": "s",
+          "subject": "",
+          "text": "Sprecher A: Hallo, guten Tag, Wilhelm ist mein Name, ich bin Kundenberater der Firma Nutriopharm. Sie haben sich bei uns eingetragen für das Produkt Erosen, Herr Schnicke. Sprecher B: Ja, da habe ich gerade mit einem Kollegen gesprochen von Ihnen. Sprecher A: Ach so, gerade vor kurzem? Sprecher B: Ja, vor kurzem, ja. Sprecher A: Ja, also Sie haben das Angebot abgelehnt, wahrscheinlich wegen dem hohen Preis, ne? Genau, also der Grund unseres Telefonates jetzt, ich denke, wir haben ein neues Angebot für Sie, ein tolles Angebot. Also wir können Ihnen die 40 Kapseln Erosin für eine vollständige Genesungskur anstatt 234 für 165 anbieten, und da bezahlen Sie nur 41 Euro für jede Packung. Diese 40 Kapseln würden ausreichen, ihre Männergesundheit wiederherzustellen, also das gesamte urogenitale System des Mannes wird ins Gleichgewicht gebracht mit den notwendigen Vitaminen, Hormonen, Mineralien, Antioxidantien und alles, was der Körper braucht, was eine gute Erektion und eine hohe Dauer des Geschlechtsverkehrs gewährleistet, Herr Schnitte. Also es wäre eine tolle Angelegenheit für Sie. Sprecher B: Ja, ich habe ja schon Präparate, habe ja schon jetzt hier. Sprecher A: Ja, also unser Präparat Erosin unterscheidet sich sehr von den herkömmlichen Mitteln, die Sie zuvor bestellt haben oder gekauft haben, sowohl in der Zusammensetzung als auch in der Wirkung. Es ist völlig natürlich, hat keine Kontraindikationen und Nebenwirkungen und wurde speziell entwickelt, um die Produktion Ihres eigenen Testosterons wiederherzustellen. Es normalisiert auch die Arbeit des Urogenitalsystems im Allgemeinen und stimuliert die Blutzirkulation für eine dauerhafte Erektion. Funktioniert unabhängig vom Alter, belastet nicht das Herz, so wie Viagra oder Cialis zum Beispiel, verursacht auch keine Allergie, Übelkeit, Schwindel, ne. Also das Produkt ist sehr effektiv. Hat ein garantiertes und schnelles Ergebnis, und außerdem verfügt das Produkt über Qualitätszertifikate und klinische Studien, die seine Sicherheit und Wirksamkeit bestätigen, Herr Schnieke. Sprecher B: Ja, ich hab das gelesen, habe ich das. Ja, ich bin gerade auf Ihrer Seite, Kreuter. Sprecher A: Genau, also Erosene ist wirklich das Beste, was Sie für Ihren Urogenitaltrakt machen können, und es wurde nicht nur für den Geschlechtsverkehr gedacht, sondern um eine therapeutische Wirkung für mindestens 3 Jahre zu erreichen. Also es ist auch gut, falls Sie Probleme beim Wasserlassen haben, hormonelle Störungen, Schmerzen, Unbehagen, Prostatitis. Ja, wurden Sie schon in der Prostata operiert, Herr Schnicke? Sprecher B: Nein, wurde ich noch nie. Ich habe jetzt einen Termin gekriegt, jetzt nächsten Monat, also nächste Woche. Muss ich zum Urologen. Sprecher A: Ja. Sprecher B: So, weil, wenn ich denn also jetzt höre, da ist die Prostata vergrößert, ne, ist da— Sprecher A: Ah, die Prostata ist vergrößert. Also es wurde schon festgestellt. Sprecher B: Ja. Wo ich vor 3 Jahren schon da war, beim Urologen, da wurde das schon festgestellt. Sprecher A: Ja, also Erosin wird Ihnen bestimmt sehr gut tun. Sprecher B: Na, also ich habe jetzt ein anderes Präparat, das geht praktisch die Bröcke da verkleinern und mit Erfolg jetzt. Also ich habe kein Brennen beim Auto laufen gehen, nichts hier, also es tut nichts weh. Sprecher A: Ja, also Erosin hat eine komplexe Wirkung auf das gesamte Urinkalensystem, schizomanisch. Es fördert die Produktion von Testosteron, das normale Funktionieren des Kreislaufs. Sowie das richtige Gleichgewicht von Hormonen und Vitaminen im Organismus. Und es hat auch eine kumulative Wirkung, deswegen empfehlen wir oder bieten wir mindestens 40 Kapseln an. Also die ersten 2 Packungen geben einen ersten Effekt, aber die vollständige Lösung des Problems braucht natürlich etwas Zeit. Und es ist auch wichtig, täglich einzunehmen, also eine Kapsel pro Tag, am besten zur gleichen Uhrzeit. Immer, und falls Sie Geschlechtsverkehr haben wollen, empfehlen wir mindestens 15 Minuten vorher einzunehmen, aber nicht mehr als eine Kapsel pro Tag. Ja, 95% unserer Kunden sind mit den Ergebnissen zufrieden in ganz Deutschland, und dies wird durch Umfragen von Menschen bestätigt, die den Kurs schon abgeschlossen haben, Herr Schnicke. Also eine Packung kostet normalerweise 79 und noch heute haben Sie die Chance, die 4 Packungen für 165 zu bekommen. Also es wäre ein tolles Angebot für Sie, ne? Sprecher B: Ja, es ist Angebot. Hier steht 39 die Packung. Sprecher A: Genau, ja, also 39 ist der Aktionspreis mit Ermäßigung für eine Packung. Und wir können, wie gesagt, für 41 Euro jede Packung machen, einschließlich Versandkosten. Alles schon mittendrin. Sie erhalten 40 Kapseln. Haben Sie welche Bedenken, Herr Schnieke? Sprecher B: Ja, ja, ich bedenke schon, warum das so gemacht wird. Weil Zähne drin sind, ne? Sprecher A: Ja, also Erosin ist auch gut mit anderen Medikamenten kombinierbar, falls Sie welche einnehmen, von Arzt verschrieben, und ist sogar mit Alkohol kombinierbar. Also Sie können ruhig dann Ihr Bier trinken und so weiter. Sprecher B: Ne, also, passen Sie mal an, ich brauche mal Bedenkzeit. Ich melde mich mal später nochmal. Sprecher A: Ja, also es wäre natürlich super, wenn Sie heute noch bei uns melden, damit Sie das Angebot nicht verlieren, ne? Weil im Gegensatz zu den Mitteln, die Sie, von denen Sie sagen, dass Sie schon ausprobiert haben und die Ihnen kein Ergebnis gebracht haben, ne? Sprecher B: Unser Produkt wirkt schon. Das ist genauso ein Mittel wie bei Ihnen. Das hilft nicht gleich von heute auf morgen. Sprecher A: Nein, also tatsächlich, ne? Also die Wirkung tritt beim schon nach den ersten Tagen die Anwendung, so ungefähr nach dem 7. oder 10. Tag. Sie sollten jedoch weiter einnehmen, bis alle 40 Kapseln fertig sind, damit garantiert, dass der Körper genug Inhaltsstoffe absorbiert. Ja, Sie werden erstens die Kur in 2 oder 3 Jahren wiederholen müssen, wenn Sie wollen. Also Sie sind dazu nicht verpflichtet, aber zumindest so wird es empfohlen, weil mit dem Alter können solche Probleme mit Erektion auftreten bei uns Männer. Deswegen ist es auch empfehlenswert, zeitweise nachzuholen. Sprecher B: Ja, deswegen habe ich jetzt hier Termin nächsten Monat, also Anfang nächsten Monats beim Urologen. Deswegen lasse mich da mal beraten. Ja, aber Sie haben gesagt, Sie haben schon einen Verdächtigen, Prostata, ne? Ja, ich habe, habe hier auch schon Medikamente, habe ich schon hier und habe ich mir schon gekauft, alles schön. So, und das hilft auch jetzt hier. Also ich habe ja nur beim Wasserlaufen jetzt durch die Creme und ganz durchschlafen, genau, das ist doch schon Erfolg. Sprecher A: Ja, also Sie können dadurch den Testosteronspiegel aufrechthalten, was ja auch hilft. Sprecher B: Das habe ich extra, Testosteron habe ich extra für Sie da, und da brauche ich bloß einen Tropfen in den Mund zu nehmen hier, und das reicht von ganzem Tag. Sprecher A: Ah, verstehe. Sprecher B: Deswegen habe ich. Und das letzte jetzt hier, Vitamin D2, die habe ich jetzt bestellt. Die nehme ich dann auch anschließend noch dazu. Sprecher A: Ja, Isoerosin unterscheidet sich sowohl in der Zusammensetzung als auch in der Wirkung von den herkömmlichen Mitteln erheblich. Also L-Arginin zum Beispiel hat eine erweiternde Wirkung. Auf die Gefäßwände und auf die Arterien. Also ist sehr gut für die Durchblutung. Serenor-Palme-Extrakt normalisiert auch von der Prostata. Sprecher B: Das habe ich alles mit in meinem Päckchen jetzt. Sprecher A: Ah, okay. Sprecher B: Da muss ich auch 2 Tabletten nehmen, früh und abends nach der Mahlzeiten. Und das mache ich jetzt schon die ganzen Monate, habe ich das jetzt schon. Und nach 3 Monaten hab ich noch dazu gekauft, nochmal vor 3 Monaten. Und das hilft auch. Sprecher A: Ja, und haben Sie da Erfolg damit? Sprecher B: Ja, jetzt mit dem Wellengebrochenen da, hab ich Erfolg. Das hat er beim Ping-Pong mir gesagt, hat es da wehgetan am Anfang. Jetzt ist es weg jetzt. Und musste in der Nacht hier 3, 4 Mal raus. Und das ist auch weg jetzt. Jetzt kann ich durchschlafen bis früh. Sprecher A: Ah, sehr gut. Ja. Also wollen Sie das Angebot nicht nutzen, Herr Schnicke? Sprecher B: Nein, wir lassen das. Ich zeige später. Mal sehen. Okay, ja. Sprecher A: Ja, okay, sollen wir Sie später mal anrufen oder machen Sie das? Sprecher B: Nein, ich habe jetzt Ihre Seite hier, da kann ich sofort draufgehen. Sprecher A: Okay, good. Sprecher B: I wish you a nice weekend. Yeah, I wish you also a nice day.",
+          "segments": "[\n  {\n    \"speaker\": \"A\",\n    \"start\": 3060,\n    \"end\": 14804,\n    \"text\": \"Hallo, guten Tag, Wilhelm ist mein Name, ich bin Kundenberater der Firma Nutriopharm. Sie haben sich bei uns eingetragen für das Produkt Erosen, Herr Schnicke.\"\n  },\n  {\n    \"speaker\": \"B\",\n    \"start\": 16759,\n    \"end\": 20572,\n    \"text\": \"Ja, da habe ich gerade mit einem Kollegen gesprochen von Ihnen.\"\n  },\n  {\n    \"speaker\": \"A\",\n    \"start\": 20780,\n    \"end\": 21854,\n    \"text\": \"Ach so, gerade vor kurzem?\"\n  },\n  {\n    \"speaker\": \"B\",\n    \"start\": 23248,\n    \"end\": 24097,\n    \"text\": \"Ja, vor kurzem, ja.\"\n  },\n  {\n    \"speaker\": \"A\",\n    \"start\": 25026,\n    \"end\": 79086,\n    \"text\": \"Ja, also Sie haben das Angebot abgelehnt, wahrscheinlich wegen dem hohen Preis, ne? Genau, also der Grund unseres Telefonates jetzt, ich denke, wir haben ein neues Angebot für Sie, ein tolles Angebot. Also wir können Ihnen die 40 Kapseln Erosin für eine vollständige Genesungskur anstatt 234 für 165 anbieten, und da bezahlen Sie nur 41 Euro für jede Packung. Diese 40 Kapseln würden ausreichen, ihre Männergesundheit wiederherzustellen, also das gesamte urogenitale System des Mannes wird ins Gleichgewicht gebracht mit den notwendigen Vitaminen, Hormonen, Mineralien, Antioxidantien und alles, was der Körper braucht, was eine gute Erektion und eine hohe Dauer des Geschlechtsverkehrs gewährleistet, Herr Schnitte. Also es wäre eine tolle Angelegenheit für Sie.\"\n  },\n  {\n    \"speaker\": \"B\",\n    \"start\": 81386,\n    \"end\": 86255,\n    \"text\": \"Ja, ich habe ja schon Präparate, habe ja schon jetzt hier.\"\n  },\n  {\n    \"speaker\": \"A\",\n    \"start\": 86367,\n    \"end\": 147295,\n    \"text\": \"Ja, also unser Präparat Erosin unterscheidet sich sehr von den herkömmlichen Mitteln, die Sie zuvor bestellt haben oder gekauft haben, sowohl in der Zusammensetzung als auch in der Wirkung. Es ist völlig natürlich, hat keine Kontraindikationen und Nebenwirkungen und wurde speziell entwickelt, um die Produktion Ihres eigenen Testosterons wiederherzustellen. Es normalisiert auch die Arbeit des Urogenitalsystems im Allgemeinen und stimuliert die Blutzirkulation für eine dauerhafte Erektion. Funktioniert unabhängig vom Alter, belastet nicht das Herz, so wie Viagra oder Cialis zum Beispiel, verursacht auch keine Allergie, Übelkeit, Schwindel, ne. Also das Produkt ist sehr effektiv. Hat ein garantiertes und schnelles Ergebnis, und außerdem verfügt das Produkt über Qualitätszertifikate und klinische Studien, die seine Sicherheit und Wirksamkeit bestätigen, Herr Schnieke.\"\n  },\n  {\n    \"speaker\": \"B\",\n    \"start\": 148230,\n    \"end\": 153982,\n    \"text\": \"Ja, ich hab das gelesen, habe ich das. Ja, ich bin gerade auf Ihrer Seite, Kreuter.\"\n  },\n  {\n    \"speaker\": \"A\",\n    \"start\": 155383,\n    \"end\": 188166,\n    \"text\": \"Genau, also Erosene ist wirklich das Beste, was Sie für Ihren Urogenitaltrakt machen können, und es wurde nicht nur für den Geschlechtsverkehr gedacht, sondern um eine therapeutische Wirkung für mindestens 3 Jahre zu erreichen. Also es ist auch gut, falls Sie Probleme beim Wasserlassen haben, hormonelle Störungen, Schmerzen, Unbehagen, Prostatitis. Ja, wurden Sie schon in der Prostata operiert, Herr Schnicke?\"\n  },\n  {\n    \"speaker\": \"B\",\n    \"start\": 189322,\n    \"end\": 197560,\n    \"text\": \"Nein, wurde ich noch nie. Ich habe jetzt einen Termin gekriegt, jetzt nächsten Monat, also nächste Woche. Muss ich zum Urologen.\"\n  },\n  {\n    \"speaker\": \"A\",\n    \"start\": 198717,\n    \"end\": 198877,\n    \"text\": \"Ja.\"\n  },\n  {\n    \"speaker\": \"B\",\n    \"start\": 201286,\n    \"end\": 207406,\n    \"text\": \"So, weil, wenn ich denn also jetzt höre, da ist die Prostata vergrößert, ne, ist da—\"\n  },\n  {\n    \"speaker\": \"A\",\n    \"start\": 207406,\n    \"end\": 212096,\n    \"text\": \"Ah, die Prostata ist vergrößert. Also es wurde schon festgestellt.\"\n  },\n  {\n    \"speaker\": \"B\",\n    \"start\": 212449,\n    \"end\": 218521,\n    \"text\": \"Ja. Wo ich vor 3 Jahren schon da war, beim Urologen, da wurde das schon festgestellt.\"\n  },\n  {\n    \"speaker\": \"A\",\n    \"start\": 219372,\n    \"end\": 221653,\n    \"text\": \"Ja, also Erosin wird Ihnen bestimmt sehr gut tun.\"\n  },\n  {\n    \"speaker\": \"B\",\n    \"start\": 222487,\n    \"end\": 237946,\n    \"text\": \"Na, also ich habe jetzt ein anderes Präparat, das geht praktisch die Bröcke da verkleinern und mit Erfolg jetzt. Also ich habe kein Brennen beim Auto laufen gehen, nichts hier, also es tut nichts weh.\"\n  },\n  {\n    \"speaker\": \"A\",\n    \"start\": 238476,\n    \"end\": 322603,\n    \"text\": \"Ja, also Erosin hat eine komplexe Wirkung auf das gesamte Urinkalensystem, schizomanisch. Es fördert die Produktion von Testosteron, das normale Funktionieren des Kreislaufs. Sowie das richtige Gleichgewicht von Hormonen und Vitaminen im Organismus. Und es hat auch eine kumulative Wirkung, deswegen empfehlen wir oder bieten wir mindestens 40 Kapseln an. Also die ersten 2 Packungen geben einen ersten Effekt, aber die vollständige Lösung des Problems braucht natürlich etwas Zeit. Und es ist auch wichtig, täglich einzunehmen, also eine Kapsel pro Tag, am besten zur gleichen Uhrzeit. Immer, und falls Sie Geschlechtsverkehr haben wollen, empfehlen wir mindestens 15 Minuten vorher einzunehmen, aber nicht mehr als eine Kapsel pro Tag. Ja, 95% unserer Kunden sind mit den Ergebnissen zufrieden in ganz Deutschland, und dies wird durch Umfragen von Menschen bestätigt, die den Kurs schon abgeschlossen haben, Herr Schnicke. Also eine Packung kostet normalerweise 79 und noch heute haben Sie die Chance, die 4 Packungen für 165 zu bekommen. Also es wäre ein tolles Angebot für Sie, ne?\"\n  },\n  {\n    \"speaker\": \"B\",\n    \"start\": 325205,\n    \"end\": 330392,\n    \"text\": \"Ja, es ist Angebot. Hier steht 39 die Packung.\"\n  },\n  {\n    \"speaker\": \"A\",\n    \"start\": 330505,\n    \"end\": 353997,\n    \"text\": \"Genau, ja, also 39 ist der Aktionspreis mit Ermäßigung für eine Packung. Und wir können, wie gesagt, für 41 Euro jede Packung machen, einschließlich Versandkosten. Alles schon mittendrin. Sie erhalten 40 Kapseln. Haben Sie welche Bedenken, Herr Schnieke?\"\n  },\n  {\n    \"speaker\": \"B\",\n    \"start\": 355554,\n    \"end\": 361142,\n    \"text\": \"Ja, ja, ich bedenke schon, warum das so gemacht wird. Weil Zähne drin sind, ne?\"\n  },\n  {\n    \"speaker\": \"A\",\n    \"start\": 362313,\n    \"end\": 375069,\n    \"text\": \"Ja, also Erosin ist auch gut mit anderen Medikamenten kombinierbar, falls Sie welche einnehmen, von Arzt verschrieben, und ist sogar mit Alkohol kombinierbar. Also Sie können ruhig dann Ihr Bier trinken und so weiter.\"\n  },\n  {\n    \"speaker\": \"B\",\n    \"start\": 375437,\n    \"end\": 386430,\n    \"text\": \"Ne, also, passen Sie mal an, ich brauche mal Bedenkzeit. Ich melde mich mal später nochmal.\"\n  },\n  {\n    \"speaker\": \"A\",\n    \"start\": 387699,\n    \"end\": 402192,\n    \"text\": \"Ja, also es wäre natürlich super, wenn Sie heute noch bei uns melden, damit Sie das Angebot nicht verlieren, ne? Weil im Gegensatz zu den Mitteln, die Sie, von denen Sie sagen, dass Sie schon ausprobiert haben und die Ihnen kein Ergebnis gebracht haben, ne?\"\n  },\n  {\n    \"speaker\": \"B\",\n    \"start\": 402644,\n    \"end\": 409338,\n    \"text\": \"Unser Produkt wirkt schon. Das ist genauso ein Mittel wie bei Ihnen. Das hilft nicht gleich von heute auf morgen.\"\n  },\n  {\n    \"speaker\": \"A\",\n    \"start\": 410352,\n    \"end\": 452837,\n    \"text\": \"Nein, also tatsächlich, ne? Also die Wirkung tritt beim schon nach den ersten Tagen die Anwendung, so ungefähr nach dem 7. oder 10. Tag. Sie sollten jedoch weiter einnehmen, bis alle 40 Kapseln fertig sind, damit garantiert, dass der Körper genug Inhaltsstoffe absorbiert. Ja, Sie werden erstens die Kur in 2 oder 3 Jahren wiederholen müssen, wenn Sie wollen. Also Sie sind dazu nicht verpflichtet, aber zumindest so wird es empfohlen, weil mit dem Alter können solche Probleme mit Erektion auftreten bei uns Männer. Deswegen ist es auch empfehlenswert, zeitweise nachzuholen.\"\n  },\n  {\n    \"speaker\": \"B\",\n    \"start\": 454077,\n    \"end\": 482744,\n    \"text\": \"Ja, deswegen habe ich jetzt hier Termin nächsten Monat, also Anfang nächsten Monats beim Urologen. Deswegen lasse mich da mal beraten. Ja, aber Sie haben gesagt, Sie haben schon einen Verdächtigen, Prostata, ne? Ja, ich habe, habe hier auch schon Medikamente, habe ich schon hier und habe ich mir schon gekauft, alles schön. So, und das hilft auch jetzt hier. Also ich habe ja nur beim Wasserlaufen jetzt durch die Creme und ganz durchschlafen, genau, das ist doch schon Erfolg.\"\n  },\n  {\n    \"speaker\": \"A\",\n    \"start\": 483922,\n    \"end\": 489723,\n    \"text\": \"Ja, also Sie können dadurch den Testosteronspiegel aufrechthalten, was ja auch hilft.\"\n  },\n  {\n    \"speaker\": \"B\",\n    \"start\": 489916,\n    \"end\": 500210,\n    \"text\": \"Das habe ich extra, Testosteron habe ich extra für Sie da, und da brauche ich bloß einen Tropfen in den Mund zu nehmen hier, und das reicht von ganzem Tag.\"\n  },\n  {\n    \"speaker\": \"A\",\n    \"start\": 501543,\n    \"end\": 502377,\n    \"text\": \"Ah, verstehe.\"\n  },\n  {\n    \"speaker\": \"B\",\n    \"start\": 502489,\n    \"end\": 515762,\n    \"text\": \"Deswegen habe ich. Und das letzte jetzt hier, Vitamin D2, die habe ich jetzt bestellt. Die nehme ich dann auch anschließend noch dazu.\"\n  },\n  {\n    \"speaker\": \"A\",\n    \"start\": 515875,\n    \"end\": 536923,\n    \"text\": \"Ja, Isoerosin unterscheidet sich sowohl in der Zusammensetzung als auch in der Wirkung von den herkömmlichen Mitteln erheblich. Also L-Arginin zum Beispiel hat eine erweiternde Wirkung. Auf die Gefäßwände und auf die Arterien. Also ist sehr gut für die Durchblutung. Serenor-Palme-Extrakt normalisiert auch von der Prostata.\"\n  },\n  {\n    \"speaker\": \"B\",\n    \"start\": 538077,\n    \"end\": 541812,\n    \"text\": \"Das habe ich alles mit in meinem Päckchen jetzt.\"\n  },\n  {\n    \"speaker\": \"A\",\n    \"start\": 542021,\n    \"end\": 542454,\n    \"text\": \"Ah, okay.\"\n  },\n  {\n    \"speaker\": \"B\",\n    \"start\": 542566,\n    \"end\": 559136,\n    \"text\": \"Da muss ich auch 2 Tabletten nehmen, früh und abends nach der Mahlzeiten. Und das mache ich jetzt schon die ganzen Monate, habe ich das jetzt schon. Und nach 3 Monaten hab ich noch dazu gekauft, nochmal vor 3 Monaten. Und das hilft auch.\"\n  },\n  {\n    \"speaker\": \"A\",\n    \"start\": 559248,\n    \"end\": 562411,\n    \"text\": \"Ja, und haben Sie da Erfolg damit?\"\n  },\n  {\n    \"speaker\": \"B\",\n    \"start\": 563985,\n    \"end\": 581406,\n    \"text\": \"Ja, jetzt mit dem Wellengebrochenen da, hab ich Erfolg. Das hat er beim Ping-Pong mir gesagt, hat es da wehgetan am Anfang. Jetzt ist es weg jetzt. Und musste in der Nacht hier 3, 4 Mal raus. Und das ist auch weg jetzt. Jetzt kann ich durchschlafen bis früh.\"\n  },\n  {\n    \"speaker\": \"A\",\n    \"start\": 582547,\n    \"end\": 590126,\n    \"text\": \"Ah, sehr gut. Ja. Also wollen Sie das Angebot nicht nutzen, Herr Schnicke?\"\n  },\n  {\n    \"speaker\": \"B\",\n    \"start\": 591844,\n    \"end\": 596902,\n    \"text\": \"Nein, wir lassen das. Ich zeige später. Mal sehen. Okay, ja.\"\n  },\n  {\n    \"speaker\": \"A\",\n    \"start\": 598026,\n    \"end\": 601767,\n    \"text\": \"Ja, okay, sollen wir Sie später mal anrufen oder machen Sie das?\"\n  },\n  {\n    \"speaker\": \"B\",\n    \"start\": 602281,\n    \"end\": 606103,\n    \"text\": \"Nein, ich habe jetzt Ihre Seite hier, da kann ich sofort draufgehen.\"\n  },\n  {\n    \"speaker\": \"A\",\n    \"start\": 607516,\n    \"end\": 607869,\n    \"text\": \"Okay, good.\"\n  },\n  {\n    \"speaker\": \"B\",\n    \"start\": 608078,\n    \"end\": 619917,\n    \"text\": \"I wish you a nice weekend. Yeah, I wish you also a nice day.\"\n  }\n]"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
   "connections": {
     "Webhook": {
       "main": [
@@ -404,17 +800,6 @@
           {
             "node": "Merge",
             "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Ollama Chat Model": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "Basic LLM Chain",
-            "type": "ai_languageModel",
             "index": 0
           }
         ]
@@ -495,6 +880,76 @@
       "main": [
         []
       ]
+    },
+    "Webhook Audio Upload": {
+      "main": [
+        [
+          {
+            "node": "Transcribe and Diarize API",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe Local": {
+      "main": [
+        []
+      ]
+    },
+    "Transcribe and Diarize API": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Normalize1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize1": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
@@ -502,7 +957,7 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "bc7c8f83-071a-4a18-9892-1d5edd6c6216",
+  "versionId": "77b2e5ec-87e8-46b0-a02d-1916b5d6fc04",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "b0b3c0461964838e0d3fd08e97cc797827cdf6496952885d8860b1289ab8b4f1"
