@@ -117,6 +117,11 @@ async def diarize(file: UploadFile = File(...)):
     if current is not None:
         segments.append(current)
 
+    transcript_text = "\n".join(
+        f"Speaker {segment['speaker']}: {segment['text']}"
+        for segment in segments
+    )
+
     return {
         "transcript_text": transcript_text,
         "segments": segments
