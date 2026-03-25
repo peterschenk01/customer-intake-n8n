@@ -42,7 +42,7 @@ Before starting, make sure you have:
 
 - [Docker](https://www.docker.com/)
 - [Docker Compose](https://docs.docker.com/compose/)
-- an [AssemblyAI](https://www.assemblyai.com/) API key for diarization
+- an [AssemblyAI](https://www.assemblyai.com/) API key for speaker diarization
 
 Optional:
 
