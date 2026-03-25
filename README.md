@@ -1,8 +1,6 @@
 # Customer Contact n8n Workflow
 
-A centralized `n8n` workflow for processing customer interactions from multiple channels, including webhooks, audio uploads, and inbound email.
-
-The system uses `n8n` to turn raw customer communication into structured, reviewable records. It supports transcription, speaker diarization, summarization, sentiment analysis, and follow-up classification.
+A centralized `n8n` workflow for processing customer interactions from multiple channels, including webhooks, audio uploads, and inbound email. The system uses `n8n` to turn raw customer communication into structured, reviewable records. It supports transcription, speaker diarization, summarization, sentiment analysis, and follow-up classification.
 
 ## Features
 
