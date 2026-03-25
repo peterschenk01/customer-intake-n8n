@@ -52,6 +52,17 @@
       gap: 10px;
     }
 
+    .button-group.triple {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .sample-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
     button {
       border: none;
       border-radius: 10px;
@@ -80,6 +91,14 @@
       background: #15803d;
     }
 
+    .btn-secondary {
+      background: #475569;
+    }
+
+    .btn-secondary:hover {
+      background: #334155;
+    }
+
     .status {
       margin-top: 12px;
       padding: 10px;
@@ -100,8 +119,44 @@
       color: #991b1b;
     }
 
+    .sample-box {
+      margin-bottom: 16px;
+      padding: 14px;
+      border-radius: 12px;
+      background: #eef2ff;
+      border: 1px solid #c7d2fe;
+    }
+
+    .sample-box label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #1e293b;
+    }
+
+    .sample-box select {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #a5b4fc;
+      margin-bottom: 10px;
+    }
+
+    .sample-preview {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.5;
+      color: #334155;
+      white-space: pre-wrap;
+    }
+
     @media (max-width: 820px) {
       .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sample-actions,
+      .button-group.triple {
         grid-template-columns: 1fr;
       }
     }
@@ -135,6 +190,16 @@
     <div class="card">
       <h2>Customer Message</h2>
 
+      <div class="sample-box">
+        <label for="sampleMessage">Sample message</label>
+        <select id="sampleMessage" onchange="previewSample()"></select>
+        <div class="sample-actions">
+          <button class="btn-secondary" onclick="loadSample()">Load sample</button>
+          <button class="btn-test" onclick="sendSampleMessage()">Send sample to test webhook</button>
+        </div>
+        <p id="samplePreview" class="sample-preview"></p>
+      </div>
+
       <input id="name" placeholder="Name" />
       <input id="email" type="email" placeholder="Email" />
       <input id="phone_msg" placeholder="Phone" />
@@ -162,10 +227,83 @@
 
     const MSG_TEST = 'http://localhost:5678/webhook-test/customer-contact/message';
     const MSG_PROD = 'http://localhost:5678/webhook/customer-contact/message';
+    const SAMPLE_MESSAGES = [
+      {
+        id: 'billing-followup',
+        label: 'Billing follow-up',
+        data: {
+          name: 'Anna Becker',
+          email: 'anna.becker@example.com',
+          phone: '+49 151 23456789',
+          subject: 'Rueckfrage zur letzten Rechnung',
+          message: 'Guten Tag, auf meiner letzten Rechnung wurden zwei Positionen doppelt berechnet. Bitte pruefen Sie das und rufen Sie mich morgen Vormittag zur Klaerung zurueck.'
+        }
+      },
+      {
+        id: 'delivery-delay',
+        label: 'Delivery delay complaint',
+        data: {
+          name: 'Markus Klein',
+          email: 'markus.klein@example.com',
+          phone: '+49 171 98765432',
+          subject: 'Lieferung noch nicht angekommen',
+          message: 'Meine Bestellung sollte gestern geliefert werden, ist aber weiterhin nicht eingetroffen. Ich brauche dringend ein Update zum Status und einen neuen Liefertermin.'
+        }
+      },
+      {
+        id: 'cancellation-request',
+        label: 'Cancellation request',
+        data: {
+          name: 'Sophie Wagner',
+          email: 'sophie.wagner@example.com',
+          phone: '+49 160 45678901',
+          subject: 'Bitte Vertrag kuendigen',
+          message: 'Ich moechte meinen Vertrag zum naechstmoeglichen Termin kuendigen. Bitte bestaetigen Sie mir schriftlich den Eingang meiner Anfrage und das genaue Vertragsende.'
+        }
+      }
+    ];
 
     function setStatus(el, type, msg) {
       el.className = `status ${type}`;
       el.textContent = msg;
+    }
+
+    function getSelectedSample() {
+      const selectedId = document.getElementById('sampleMessage').value;
+      return SAMPLE_MESSAGES.find(sample => sample.id === selectedId) || SAMPLE_MESSAGES[0];
+    }
+
+    function previewSample() {
+      const sample = getSelectedSample();
+      document.getElementById('samplePreview').textContent =
+        `${sample.data.name}\n${sample.data.email}\n${sample.data.phone}\n${sample.data.subject}\n\n${sample.data.message}`;
+    }
+
+    function loadSample() {
+      const sample = getSelectedSample();
+      document.getElementById('name').value = sample.data.name;
+      document.getElementById('email').value = sample.data.email;
+      document.getElementById('phone_msg').value = sample.data.phone;
+      document.getElementById('subject').value = sample.data.subject;
+      document.getElementById('message').value = sample.data.message;
+    }
+
+    async function sendPayload(url, data, status, loadingText) {
+      setStatus(status, 'success', loadingText);
+
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        const text = await res.text();
+        if (!res.ok) throw new Error(text);
+        setStatus(status, 'success', 'Success:\n' + text);
+      } catch (e) {
+        setStatus(status, 'error', e.message);
+      }
     }
 
     async function sendAudio(url) {
@@ -211,22 +349,28 @@
         return;
       }
 
-      setStatus(status, 'success', 'Sending...');
-
-      try {
-        const res = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
-        });
-
-        const text = await res.text();
-        if (!res.ok) throw new Error(text);
-        setStatus(status, 'success', 'Success:\n' + text);
-      } catch (e) {
-        setStatus(status, 'error', e.message);
-      }
+      await sendPayload(url, data, status, 'Sending...');
     }
+
+    async function sendSampleMessage() {
+      const status = document.getElementById('messageStatus');
+      const sample = getSelectedSample();
+      loadSample();
+      await sendPayload(MSG_TEST, sample.data, status, 'Sending sample...');
+    }
+
+    function initSamples() {
+      const select = document.getElementById('sampleMessage');
+      SAMPLE_MESSAGES.forEach(sample => {
+        const option = document.createElement('option');
+        option.value = sample.id;
+        option.textContent = sample.label;
+        select.appendChild(option);
+      });
+      previewSample();
+    }
+
+    initSamples();
   </script>
 </body>
 
