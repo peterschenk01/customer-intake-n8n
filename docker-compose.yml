@@ -44,6 +44,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      audio-processing-api:
+        condition: service_healthy
 
   n8n-runner:
     image: n8nio/runners:${N8N_VERSION}
@@ -71,3 +73,18 @@ services:
     ports:
       - "8000:8000"
     restart: always
+
+  audio-processing-api:
+    build:
+      context: ./audio-processing-api
+    env_file:
+      - .env
+    container_name: audio-processing-api
+    ports:
+      - "8001:8000"
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 5s
+      timeout: 2s
+      retries: 50
